@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { League } from '@/types/league';
 import { useSeasonBadge } from '@/api/seasonBadge';
 
@@ -13,17 +13,24 @@ export function useLeagueBadgeViewer() {
     refetch,
   } = useSeasonBadge(selectedLeague?.idLeague ?? null);
 
-  return {
-    selectedLeague,
-    isOpen: selectedLeague !== null,
-    badge,
-    isLoading,
-    isError,
-    isFetching,
-    openBadge: (league: League) => setSelectedLeague(league),
-    closeBadge: () => setSelectedLeague(null),
-    retry: () => {
-      void refetch();
-    },
-  };
+  const openBadge = useCallback((league: League) => setSelectedLeague(league), []);
+  const closeBadge = useCallback(() => setSelectedLeague(null), []);
+  const retry = useCallback(() => {
+    void refetch();
+  }, [refetch]);
+
+  return useMemo(
+    () => ({
+      selectedLeague,
+      isOpen: selectedLeague !== null,
+      badge,
+      isLoading,
+      isError,
+      isFetching,
+      openBadge,
+      closeBadge,
+      retry,
+    }),
+    [selectedLeague, badge, isLoading, isError, isFetching, openBadge, closeBadge, retry],
+  );
 }
