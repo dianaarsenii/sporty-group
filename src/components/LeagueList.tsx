@@ -10,6 +10,7 @@ type LeagueListProps = {
   isLoading: boolean;
   isError: boolean;
   isFetching: boolean;
+  hasActiveFilters: boolean;
   onRetry: () => void;
   onSelectLeague: (league: League) => void;
 };
@@ -19,6 +20,7 @@ export function LeagueList({
   isLoading,
   isError,
   isFetching,
+  hasActiveFilters,
   onRetry,
   onSelectLeague,
 }: LeagueListProps) {
@@ -42,11 +44,13 @@ export function LeagueList({
   }
 
   if (leagues.length === 0) {
-    return (
+    return hasActiveFilters ? (
       <EmptyState
         title="No leagues match your filters"
         description="Try a different search term or sport."
       />
+    ) : (
+      <EmptyState title="No leagues available" description="The API returned an empty list." />
     );
   }
 

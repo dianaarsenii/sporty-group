@@ -30,6 +30,8 @@ export function LeaguesPage() {
     [leagues, activeSearch, sport],
   );
 
+  const hasActiveFilters = activeSearch.trim() !== '' || sport !== ALL_SPORTS_VALUE;
+
   return (
     <main className={styles.page}>
       <header className={styles.header}>
@@ -53,6 +55,7 @@ export function LeaguesPage() {
         isLoading={isLoading}
         isError={isError}
         isFetching={isFetching}
+        hasActiveFilters={hasActiveFilters}
         onRetry={() => refetch()}
         onSelectLeague={badgeViewer.openBadge}
       />

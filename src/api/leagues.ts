@@ -9,7 +9,12 @@ export const leagueQueryKeys = {
 
 export async function getAllLeagues(signal?: AbortSignal): Promise<League[]> {
   const data = await httpGet<AllLeaguesResponse>(API_ENDPOINTS.allLeagues, signal);
-  return data.leagues ?? [];
+
+  if (!data.leagues) {
+    throw new Error('The leagues API responded without any league data.');
+  }
+
+  return data.leagues;
 }
 
 export function useAllLeagues() {
