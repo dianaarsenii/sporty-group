@@ -58,7 +58,7 @@ src/
 
 No routing, no separate state layer, no barrel `index.ts` files. The `@/*` path alias maps to `src/*`.
 
-See [AI_NOTES.md](./AI_NOTES.md) for design rationale and AI tool usage notes.
+See [AI_NOTES.md](NOTES.md) for design rationale and AI tool usage notes.
 
 ## API
 

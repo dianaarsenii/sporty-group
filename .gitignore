@@ -9,6 +9,3 @@ dist
 .idea
 .vscode
 
-# local working notes / assignment brief — never part of the submission
-*.pdf
-IMPLEMENTATION_PLAN.md

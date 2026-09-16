@@ -14,7 +14,7 @@
   width: 100%;
   max-width: 28rem;
   border-radius: 1rem;
-  background-color: #ffffff;
+  background-color: var(--color-accent-tint);
   padding: 1.5rem;
   box-shadow:
     0 20px 25px -5px rgb(0 0 0 / 0.1),

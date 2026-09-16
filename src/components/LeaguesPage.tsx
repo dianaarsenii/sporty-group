@@ -8,7 +8,6 @@ import { LeagueBadgeViewer } from './LeagueBadgeViewer';
 import { LeagueList } from './LeagueList';
 import { SearchInput } from './SearchInput';
 import { SportSelect } from './SportSelect';
-import { Button } from './Button';
 import styles from './LeaguesPage.module.css';
 
 const SEARCH_DEBOUNCE_MS = 300;
@@ -47,9 +46,6 @@ export function LeaguesPage() {
         <div className={styles.sportField}>
           <SportSelect sports={sports} value={sport} onChange={setSport} />
         </div>
-        <Button onChange={() => setSearch('')}>
-          Clear Search
-        </Button>
       </div>
 
       <LeagueList

@@ -1,5 +1,4 @@
-import { KeyboardEvent, ReactNode, useEffect } from 'react';
-import { createPortal } from 'react-dom';
+import { ReactNode, useEffect } from 'react';
 import styles from './Modal.module.css';
 
 type ModalProps = {
@@ -21,18 +20,29 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
     };
   }, [isOpen]);
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Escape') onClose();
-  };
+  useEffect(() => {
+    const handleKeyDown = (event: globalThis.KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
-  return createPortal(
+  return (
     <div className={styles.overlay} onClick={onClose}>
       <div
         className={styles.dialog}
         onClick={(event) => event.stopPropagation()}
-        onKeyDown={handleKeyDown}
       >
         <div className={styles.header}>
           {title && <h2 className={styles.title}>{title}</h2>}
@@ -42,7 +52,6 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
         </div>
         {children}
       </div>
-    </div>,
-    document.body,
+    </div>
   );
 }

@@ -15,10 +15,10 @@
 }
 
 .card:hover {
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  box-shadow: 0 4px 6px -1px var(--color-accent-ring);
 }
 
-.card:focus-visible {
+.card:focus {
   outline: none;
   box-shadow: 0 0 0 2px var(--color-accent-ring);
 }
