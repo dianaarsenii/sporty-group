@@ -15,7 +15,7 @@ A single-page app that lists sports leagues from [TheSportsDB](https://www.thesp
 
 ```bash
 npm install
-npm run dev        # http://localhost:3000, with HMR
+npm run dev        # http://localhost:3000, reloads on save
 ```
 
 Other scripts:
@@ -36,7 +36,7 @@ No environment variables or API keys are required — the app calls TheSportsDB'
 - Search bar filters leagues by name (and alternate name), debounced (300ms).
 - Dropdown filters by sport; options are derived from the fetched data.
 - Clicking a league fetches its season badges and shows the newest season (with its badge image, or a placeholder if that season has no badge yet) in a modal.
-- All API responses are cached via React Query — repeat clicks / searches don't trigger new network requests.
+- All API responses are cached via React Query — re-clicking a league never re-fetches its badge. Search and sport filtering run entirely client-side, so they never hit the network at all.
 - Loading / error (with retry) / empty states for both the league list and the badge modal.
 - A top-level error boundary shows a recoverable message instead of a blank screen.
 
@@ -58,7 +58,7 @@ src/
 
 No routing, no separate state layer, no barrel `index.ts` files. The `@/*` path alias maps to `src/*`.
 
-See [AI_NOTES.md](NOTES.md) for design rationale and AI tool usage notes.
+See [NOTES.md](NOTES.md) for design rationale and AI tool usage notes.
 
 ## API
 

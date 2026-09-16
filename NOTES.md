@@ -2,61 +2,53 @@
 
 ## AI tools used
 
-Cursor (Claude) was used throughout: planning the architecture, scaffolding the Webpack/TypeScript
-config, writing the component/hook/API code, and a later simplification pass that removed things
-that had accumulated more process/tooling weight than the assignment justified. Every change was
-reviewed and directed — architecture layering, naming, state placement, caching strategy, and
-tooling trade-offs were all iterated on, not accepted as-is.
+Cursor (Claude) was used throughout: sketching the architecture, scaffolding the Webpack/TypeScript
+config, and drafting the component, hook and API code. It was most useful for the boilerplate the
+assignment isn't really testing — the build config, the CSS Modules, the reset stylesheet. Every
+suggestion was reviewed and often redirected: layering, naming, state placement and the caching
+strategy below were all decided by hand, not accepted as generated.
 
-## Key design decisions (short version)
+## Design decisions
 
-- **Component-based architecture, flat folders.** Started with Feature-Sliced Design; flattened to
-  `components/`, `hooks/`, `api/`, `types/`, `utils/`, `app/` once the layer boundaries stopped
-  paying for themselves at this app's size.
-- **React Query for all server state.** `useAllLeagues()` fetches once and caches for the session;
-  `useSeasonBadge(leagueId)` is lazy (enabled on click) and cached per league id, so re-clicking a
-  league never re-fetches.
-- **Plain `useState` for client state**, no store. The only client state is search text, selected
-  sport, and which league's modal is open — too small to justify Redux/MobX/Zustand.
-- **Filters are not synced to the URL.** Built during development, then removed: real feature, not
-  requested, and the most complex piece of client state in the app for a benefit that doesn't apply
-  to a five-league list.
-- **Client-side filtering**, since the All Leagues endpoint has no search/sport query params.
-- **CSS Modules only, no Tailwind.** Tailwind was tried and removed — it carried a handful of
-  utility classes while duplicating the CSS Modules' own palette, and the two systems only rendered
-  correctly by accident (stylesheet import order). One system, one small global reset.
-- **One brand color** (a Sporty Group–style red), defined once as CSS custom properties and reused
-  for buttons, focus rings, and error states.
-- **No runtime schema validation, no virtualization/pagination, no router, no state manager.**
-  Reasonable for two read-only endpoints and a five-row dataset — named explicitly as trade-offs
-  rather than left implicit.
+- **React + TypeScript + Webpack, no CRA/Vite.** A single `webpack.config.ts` is small enough to read
+  end to end, and keeps the tooling explicit rather than hidden behind a scaffold.
+- **Flat, component-based structure** — `components/`, `hooks/`, `api/`, `types/`, `utils/`, `app/`.
+  At this size, deeper layering would cost more to navigate than it returns.
+- **React Query owns all server state.** `useAllLeagues()` fetches once with `staleTime: Infinity`;
+  `useSeasonBadge(leagueId)` is lazy — it only runs when a league is clicked — and is cached per
+  league ID, so re-opening a league never re-fetches. This is what satisfies the "cache responses to
+  avoid repeat calls" requirement.
+- **Plain `useState` for client state, no store.** The only client state is search text, selected
+  sport, and which league's modal is open. Redux/MobX/Zustand would be pure overhead here.
+- **Client-side filtering,** since `all_leagues.php` has no search or sport query parameters. Search
+  is debounced at 300 ms, but clearing the box applies instantly rather than waiting out the delay.
+- **CSS Modules only.** One styling system, one small global reset, and a single brand accent defined
+  as CSS custom properties and reused for buttons, focus rings and error states.
+- **Every async surface has loading, error-with-retry and empty states** — on the list and in the
+  badge modal — plus an image `onError` fallback and a top-level error boundary, so a failure
+  degrades to a recoverable message instead of a blank screen.
 
-## Simplification pass
+## Out of scope
 
-Additional time went into building a test suite and other tooling, verifying the app's behavior
-end-to-end, and then a deliberate pass back toward simplicity once that review was done:
+Left out deliberately for the ~90-minute budget, in the order I'd add them next:
 
-- Removed the Vitest + React Testing Library suite and its CI workflow. They were genuinely useful
-  during development (e.g. catching regressions in the modal and URL-sync logic), but for a
-  take-home submission they added a second toolchain to review for correctness that's easy to check
-  by hand in a couple of minutes.
-- Removed URL-synced filters, the accessible-modal focus trap, and the "Clear filters" button —
-  each was a reasonable addition, but not something the assignment asked for, and each added more
-  surface area (code, edge cases, review time) than it earned back for this submission.
-- Removed all inline code comments, on the premise that this file is the right place for *why*
-  something is built a certain way, not scattered comments.
+1. **Tests.** Given more time I'd start with `filterLeagues` and `getUniqueSports` as pure-function
+   unit tests, then component tests covering the three behaviours the brief asks for: the list
+   renders, search narrows it, and clicking a card opens the badge modal.
+2. **Fuller modal accessibility** — focus trap and focus restore on close.
+3. **Runtime schema validation** of the API responses (e.g. Zod) instead of trusting the declared types.
+4. **Virtualization or pagination,** which this dataset doesn't need but a real league list would.
 
-The general bar used throughout: keep only what directly demonstrates the judgment the assignment
-is evaluating (data handling, caching, loading/error states, resilience), and cut anything whose
-main effect was more surface area to review. Some smaller decisions (e.g. dropping an unrequested
-`maxLength` on the search input) followed the same logic without being written up individually here.
+## Time spent
 
-## Where AI suggestions were overridden
+The basic requirements (league list, search, sport filter, click-through badge modal, caching,
+loading/error/empty states) were done within the assignment's suggested ~90 minutes. An additional
+~60 minutes went into manually testing and verifying behaviour end-to-end, simplifying parts of the
+initial implementation, and fixing the issues that testing pass turned up.
 
-- A store (MobX/Redux/Zustand) was suggested at one point and skipped — client state never grew
-  large enough to need one.
-- Feature-Sliced Design and Tailwind were both introduced, then removed once their overhead stopped
-  being worth it for an app this size.
-- A full test suite and CI workflow were built, then deliberately removed for the final submission —
-  overriding an earlier scope decision, not an AI suggestion, but the same "does this complexity earn
-  its keep" judgment call as the rest of this list.
+## Note on the API
+
+The keyless `all_leagues.php` endpoint returns five leagues, all Soccer, and omits
+`strLeagueAlternate` entirely — so the sport dropdown has one real option and the alternate-name line
+shows its fallback. Both the filter and the field are implemented against the documented shape; the
+data simply doesn't exercise them. See the README for details.
